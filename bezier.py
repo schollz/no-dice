@@ -1,6 +1,7 @@
 # from https://stackoverflow.com/questions/12643079/b%C3%A9zier-curve-fitting-with-scipy
 
 import random
+import multiprocessing
 
 import numpy as np
 from scipy.misc import comb
@@ -60,7 +61,7 @@ def make_squiggle(plotit=False):
     all_xs = []
     all_ys = []
     lastPoint = None
-    for i in range(5):
+    for i in range(np.random.randint(4,8)):
         points = np.random.rand(4,2)*200
         if lastPoint is not None:
             points[0] = lastPoint
@@ -134,11 +135,21 @@ def make_squiggle(plotit=False):
     if plotit:
         plt.show()
 
-    return num 
+    return num
+
 if __name__ == "__main__":
+    # make_squiggle(True)
+    # make_squiggle(True)
+    # make_squiggle(True)
+    # make_squiggle(True)
     with open('random.txt','w') as f:
-        for i in tqdm(range(3000)):
-            f.write('{}\n'.format(make_squiggle() % 6))
+        count = 300000
+        pbar = tqdm(total=count)
+        p = multiprocessing.Pool()
+        for i, data in enumerate(p.imap_unordered(make_squiggle,[False]*count), 0):
+            pbar.update()
+            f.write('{}\n'.format(data % 6))
+        pbar.close()
     print("""Now run
 
     dieharder -f random.txt -a""")
